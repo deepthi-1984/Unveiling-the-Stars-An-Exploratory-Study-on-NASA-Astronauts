@@ -1,0 +1,102 @@
+create table astronauts(Name varchar(255) not null,	
+						Year int not null,
+						GroupNum serial not null,
+						Status varchar(50) not null,
+						Birth_Date timestamp not null,
+						Birth_Place varchar(255) not null,	
+						Gender varchar(10) not null,
+						Alma_Mater varchar(255) not null,
+						Undergraduate_Major varchar(255) not null,
+						Graduate_Major varchar(255) not null,
+						Military_Rank varchar(50) not null,
+						Military_Branch varchar(255) not null,
+						Space_Flights int not null,
+						Space_Flight_hr int not null,
+						Space_Walks int not null,	
+						Space_Walks_hr float not null,
+						Missions varchar(255) not null,
+						Death_Date timestamp,
+						Death_Mission varchar(100)
+);
+
+select * from astronauts;
+
+/* Find out the Military Branch of the astronaut.*/
+
+select military_branch, count(*) as number from astronauts
+group by military_branch;
+
+/* Top 5 Military Ranks Among Astronauts. */
+
+select military_rank, count(*) as Top from astronauts
+group by military_rank
+order by Top desc limit 5 ;
+
+/* Count of Astronauts by Gender. */
+
+select Gender, count(*) as Number from astronauts
+group by Gender;
+
+/* 
+Average Life Expectancy of Astronauts.
+What is the average life expectancy of an astronaut? */
+
+select round(avg(subquery.Life_expectancy)) as Average_Life_Expectancy 
+from (
+		select 
+			case
+				when Status = 'Deceased' Then Extract(Year from Death_date) - Extract(Year from Birth_date)
+				else (2023 - Extract(Year from Birth_date))
+			end as Life_expectancy
+		from astronauts
+) as subquery;
+
+/* Average Life Expectancy of Female Astronauts.
+What is the average life expectancy of a female astronaut? */
+
+select round(avg(subquery.Life_expectancy)) as Average_Life_Expectancy_Female
+from (
+		select 
+		case
+				when status='Deceased' and Gender = 'Female' then extract(Year from Death_date) - extract(Year from Birth_date)
+				else (2023 - extract(Year from Birth_date))
+			end as Life_expectancy
+			from astronauts
+) as subquery;
+
+/* Average Life Expectancy of Female Astronauts.
+What is the average life expectancy of a male astronaut? */
+
+select round(avg(subquery.Life_expectancy)) as Male_avg_life_expectancy
+from (
+		select 
+			case 
+				when status = 'Deceased' and gender ='Male' then extract(Year from Death_date) - extract(Year from Birth_date)
+				else (2023 - extract(Year from Birth_date))
+			end as Life_expectancy
+		from astronauts
+) as subquery
+
+/* Top 10 Graduate Majors Among Astronauts.
+Find out the top 10 educational backgrounds (graduates) that astronauts have */
+
+select graduate_major, count(*) as Number
+from astronauts
+group by graduate_major
+order by Number desc;
+
+/* Top 5 States of Birth for Astronauts.
+Find out the top 5 countries/states from which astronauts come. */
+
+select right(birth_place,2) as State, count(*) as Top
+from astronauts 
+group by State
+order by Top desc limit 5;
+
+/* Average Space Flights and Spacewalks per Astronaut.
+Find out the average number of space flights and spacewalks for astronauts. */
+
+select round(avg(space_flights),2) as Avg_Space_Flights, round(avg(space_walks),2) as Avg_Space_walks 
+from astronauts
+group by space_flights,space_walks;
+
